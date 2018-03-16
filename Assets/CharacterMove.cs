@@ -5,9 +5,12 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(CharacterAnimation))]
+[RequireComponent(typeof(CharacterAttacker))]
 public class CharacterMove : MonoBehaviour
 {
     private CharacterAnimation characterAnimation;
+    private CharacterAttacker characterAttacker;
     private Rigidbody rb;
 
     //속성
@@ -33,6 +36,7 @@ public class CharacterMove : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         navAgent = GetComponent<NavMeshAgent>();
         characterAnimation = GetComponent<CharacterAnimation>();
+        characterAttacker = GetComponent<CharacterAttacker>();
 
         bottomLayerMask = 1 << LayerMask.NameToLayer("Bottom");
         obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacle");
@@ -53,7 +57,7 @@ public class CharacterMove : MonoBehaviour
 
     void Update()
     {
-        ButtonInput();
+      //  ButtonInput();
         Rotation();
         AutoStop();
         ChangeAnimation();
@@ -66,15 +70,18 @@ public class CharacterMove : MonoBehaviour
             characterAnimation.SetSpeed(rb.velocity.magnitude);
         else
             characterAnimation.SetSpeed(navAgent.speed);
-
     }
 
-    void ButtonInput()
+    public void MoveToTarget()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            Move();
-        }
+        characterAttacker.AttackOff();
+
+#if UNITY_EDITOR      
+            Move();        
+#else       
+            Move();        
+#endif
+
     }
 
     void AutoMoveStart(Vector3 moveTarget)
@@ -129,10 +136,7 @@ public class CharacterMove : MonoBehaviour
     {
         if (Vector2.Distance(new Vector2(this.transform.position.x, this.transform.position.z), new Vector2(moveTarget.x, moveTarget.z)) <= stopDistance)
         {
-            if (nowAutoMove == true)
-                AutoMoveStop();
-            else
-                rb.velocity = Vector3.zero;
+            StopCharacter();
         }
     }
 
@@ -146,5 +150,13 @@ public class CharacterMove : MonoBehaviour
         }
 
         transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.Euler(0f, -angle + 90f, 0f), Time.deltaTime * rotateSpeed);
+    }
+
+    public void StopCharacter()
+    {
+        if (nowAutoMove == true)
+            AutoMoveStop();
+        else
+            rb.velocity = Vector3.zero;
     }
 }

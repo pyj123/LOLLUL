@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum CharacterAnimState
 {
-    Idle,Run,Attack
+    AttackOn, AttackOff
 }
 
 [RequireComponent(typeof(Animator))]
@@ -22,18 +22,16 @@ public class CharacterAnimation : MonoBehaviour
     {
         switch (animState)
         {
-            case CharacterAnimState.Idle:
+            case CharacterAnimState.AttackOn:
                 {
-
-                } break;
-            case CharacterAnimState.Run:
-                {
-
+                    if (animator.GetBool("AttackOn") == false)
+                        animator.SetBool("AttackOn", true);
                 }
                 break;
-            case CharacterAnimState.Attack:
+            case CharacterAnimState.AttackOff:
                 {
-
+                    if (animator.GetBool("AttackOn") == true)
+                        animator.SetBool("AttackOn", false);
                 }
                 break;
         }
@@ -45,5 +43,5 @@ public class CharacterAnimation : MonoBehaviour
     }
 
 
- 
+
 }
